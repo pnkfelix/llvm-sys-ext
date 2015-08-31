@@ -1,0 +1,20 @@
+[package]
+name = "llvm-ext"
+version = "0.1.0"
+authors = ["pnkfelix"]
+
+[lib]
+name = "lib"
+path = "src/lib.rs"
+
+[dependencies]
+# llvm = "*"
+semver = "*"
+
+[dependencies.llvm-alt]
+version = "0.3.1"
+git = "https://github.com/pnkfelix/llvm-rs"
+
+[dependencies.llvm-alt-sys]
+version = "0.1.4"
+git = "https://github.com/pnkfelix/llvm-sys.rs"
