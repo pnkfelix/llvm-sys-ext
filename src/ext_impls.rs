@@ -5,8 +5,10 @@ use super::Builder as BuilderExt;
 use super::Function as FunctionExt;
 use llvm::{BasicBlock, Builder, Function, Type, Value};
 use llvm_sys::core;
-use llvm_sys::analysis::{self, LLVMVerifierFailureAction};
+use llvm_sys::analysis::{LLVMVerifierFailureAction};
+use llvm_sys::prelude::{LLVMValueRef, LLVMBool};
 
+use std::ffi::CStr;
 use std::mem;
 
 static NULL_NAME:[c_char; 1] = [0];
@@ -69,11 +71,18 @@ impl FunctionExt for Function {
         unsafe { mem::transmute(core::LLVMGetLastBasicBlock(self.into())) }
     }
 
-    fn verify(&self) -> Result<(), ()> {
+    fn verify(&self) -> Result<(), String> {
         unsafe {
-            let action = LLVMVerifierFailureAction::LLVMReturnStatusAction;
-            if analysis::LLVMVerifyFunction(self.into(), action) == 1 {
-                Err(())
+            // let action = LLVMVerifierFailureAction::LLVMReturnStatusAction;
+            let mut error = mem::uninitialized();
+            let action = LLVMVerifierFailureAction::LLVMPrintMessageAction;
+            if 1 == LLVMVerifyFunctionWithOutput(self.into(),
+                                                 action,
+                                                 &mut error) {
+                let c_str = CStr::from_ptr(error);
+                let s = c_str.to_string_lossy().to_string();
+                core::LLVMDisposeMessage(error);
+                Err(s)
             } else {
                 Ok(())
             }
@@ -87,4 +96,19 @@ pub unsafe fn ptr_to_null<P, T>(ptr: *mut P) -> Option<T> where T:From<*mut P> {
     } else {
         Some(ptr.into())
     }
+}
+
+#[link(name = "wrapper")]
+extern "C" {
+    /// Verify that a function is valid, taking the specified action if not.
+    ///
+    /// Unlike `LLVMVerifyFunction`, this function supports an optional
+    /// `OutMessage` argument for storing a description of any invalid
+    /// constructs, analogous to that used in `LLVMVerifyModule`.
+    ///
+    /// Any returned `OutMessage` must then be disposed with `LLVMDisposeMessage`.
+    fn LLVMVerifyFunctionWithOutput(Fn: LLVMValueRef,
+                                    Action: LLVMVerifierFailureAction,
+                                    OutMessage: *mut *mut ::libc::c_char) -> LLVMBool;
+
 }

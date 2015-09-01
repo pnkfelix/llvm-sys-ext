@@ -1,3 +1,5 @@
+#![feature(cstr_to_str)]
+
 extern crate cbox;
 extern crate libc;
 extern crate llvm;
@@ -45,7 +47,7 @@ pub trait Function {
 
     /// Runs the built-in LLVM consistency checker on this function, returning
     /// Ok if its okay and Err if a problem was encountered.
-    fn verify(&self) -> Result<(), ()>;
+    fn verify(&self) -> Result<(), String>;
 }
 
 mod ext_impls;
