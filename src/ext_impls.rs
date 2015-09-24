@@ -107,7 +107,7 @@ extern "C" {
     /// constructs, analogous to that used in `LLVMVerifyModule`.
     ///
     /// Any returned `OutMessage` must then be disposed with `LLVMDisposeMessage`.
-    fn LLVMVerifyFunctionWithOutput(Fn: LLVMValueRef,
+    pub fn LLVMVerifyFunctionWithOutput(Fn: LLVMValueRef,
                                     Action: LLVMVerifierFailureAction,
                                     OutMessage: *mut *mut ::libc::c_char) -> LLVMBool;
 

@@ -12,3 +12,7 @@ mod ext_traits;
 mod ext_impls;
 
 mod types;
+
+pub mod sys {
+    pub use ::ext_impls::LLVMVerifyFunctionWithOutput;
+}
