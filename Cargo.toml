@@ -13,12 +13,6 @@ name = "llvm_ext"
 path = "src/lib.rs"
 
 [dependencies]
-# llvm = "*"
 semver = "*"
 libc = "*"
-cbox = "*"
 llvm-sys = "*"
-
-[dependencies.llvm-alt]
-version = "0.3.2"
-git = "https://github.com/pnkfelix/llvm-rs"
